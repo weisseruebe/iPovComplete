@@ -22,8 +22,8 @@ public class StringRenderer {
 		graphics.setColor(java.awt.Color.WHITE);
 		graphics.fillRect(0, 0, 64, 16);
 		graphics.setColor(java.awt.Color.BLACK);
-		graphics.setFont(new Font("Helvetica", Font.PLAIN, 10));
-		graphics.drawString(string, 0, 13);
+		graphics.setFont(new Font("Arial", Font.BOLD, 10));
+		graphics.drawString(string, 0, 12);
 	
 		return image;
 	}

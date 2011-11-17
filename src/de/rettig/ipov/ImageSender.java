@@ -60,7 +60,15 @@ public class ImageSender {
 	}
 	
 	public void close(){
-		port.close();
+		new Thread(new Runnable(){
+
+			@Override
+			public void run() {
+				port.close();
+				
+			}
+			
+		}).start();
 	}
 	
 	public void sendImage(String fileName) throws IOException{

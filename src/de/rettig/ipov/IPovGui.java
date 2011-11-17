@@ -7,6 +7,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -87,13 +89,23 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 	public IPovGui(org.eclipse.swt.widgets.Composite parent, int style) {
 		super(parent, style);
 		initGUI();
-
+	
 		try {
 			imageSender = new ImageSender(port);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+		getShell().addDisposeListener(new DisposeListener(){
+
+			@Override
+			public void widgetDisposed(DisposeEvent arg0) {
+				if (imageSender!=null)
+					imageSender.close();
+				
+			}
+			
+		});
 	}
 
 	private void initGUI() {
