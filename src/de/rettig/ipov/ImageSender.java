@@ -22,7 +22,7 @@ public class ImageSender {
 	private OutputStream outputStream;
 
 	public ImageSender(String portname) throws PortInUseException, NoSuchPortException, UnsupportedCommOperationException, TooManyListenersException, IOException{
-	    port = (SerialPort)CommPortIdentifier.getPortIdentifier(portname).open("flashscan",2000);
+	    port = (SerialPort)CommPortIdentifier.getPortIdentifier(portname).open("iPov",2000);
 		port.setSerialPortParams(115200, 8, 1, 0);
 		port.notifyOnDataAvailable(true);
 		outputStream = port.getOutputStream();
@@ -65,7 +65,6 @@ public class ImageSender {
 			@Override
 			public void run() {
 				port.close();
-				
 			}
 			
 		}).start();

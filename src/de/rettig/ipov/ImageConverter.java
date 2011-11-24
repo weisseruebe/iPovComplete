@@ -14,9 +14,9 @@ public class ImageConverter {
 	
 	public static void printPixelARGB(int pixel) {
 	    int alpha = (pixel >> 24) & 0xff;
-	    int red = (pixel >> 16) & 0xff;
+	    int red =   (pixel >> 16) & 0xff;
 	    int green = (pixel >> 8) & 0xff;
-	    int blue = (pixel) & 0xff;
+	    int blue =  (pixel) & 0xff;
 	    System.out.println("argb: " + alpha + ", " + red + ", " + green + ", " + blue);
 	  }
 	
@@ -37,12 +37,17 @@ public class ImageConverter {
 					}
 				}
 				bufferPos++;
-				
 			}	
 		}
 		return buffer;
 	}
 	
+	/****
+	 * Creates a String represantation of the image which can be used to initialize a byte array
+	 * in the arduino source code
+	 * @param image
+	 * @return
+	 */
 	public static String createCArrayString(BufferedImage image){
 		byte[] buf = convert(image);
 		StringBuffer stringBuffer = new StringBuffer();
@@ -58,9 +63,6 @@ public class ImageConverter {
 	public static void main(String[] args) {
 		try {
 			System.out.println(createCArrayString(ImageIO.read(new File("./images/gesicht.bmp"))));
-		
-			
-		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
