@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo
@@ -50,6 +51,7 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 	StringRenderer stringRenderer = new StringRenderer();
 	//private String port = "/dev/tty.usbserial-A8004Zfe";
 	private String port = "/dev/tty.WiiCopter-DevB";
+	private Spinner spinner1;
 	private Button btnTime;
 
 	private Scale scale1;
@@ -113,11 +115,31 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 			this.setLayout(new FormLayout());
 			this.setSize(479, 165);
 			{
+				FormData spinner1LData = new FormData();
+				spinner1LData.width = 25;
+				spinner1LData.height = 13;
+				spinner1LData.left =  new FormAttachment(0, 1000, 208);
+				spinner1LData.top =  new FormAttachment(0, 1000, 121);
+				spinner1 = new Spinner(this, SWT.NONE);
+				spinner1.setLayoutData(spinner1LData);
+				spinner1.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						try {
+							imageSender.sendTimelineIndex((byte) spinner1.getSelection());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+				});
+			}
+			{
 				btnTime = new Button(this, SWT.PUSH | SWT.CENTER);
 				FormData btnTimeLData = new FormData();
 				btnTimeLData.width = 67;
 				btnTimeLData.height = 32;
-				btnTimeLData.left =  new FormAttachment(0, 1000, 254);
+				btnTimeLData.left =  new FormAttachment(0, 1000, 270);
 				btnTimeLData.top =  new FormAttachment(0, 1000, 121);
 				btnTime.setLayoutData(btnTimeLData);
 				btnTime.setText("Time");
@@ -148,7 +170,7 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 				FormData btnNextLData = new FormData();
 				btnNextLData.width = 49;
 				btnNextLData.height = 32;
-				btnNextLData.left =  new FormAttachment(0, 1000, 174);
+				btnNextLData.left =  new FormAttachment(0, 1000, 153);
 				btnNextLData.top =  new FormAttachment(0, 1000, 121);
 				btnNext.setLayoutData(btnNextLData);
 				btnNext.setText(">");
@@ -163,7 +185,7 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 				FormData btnBackLData = new FormData();
 				btnBackLData.width = 49;
 				btnBackLData.height = 32;
-				btnBackLData.left =  new FormAttachment(0, 1000, 119);
+				btnBackLData.left =  new FormAttachment(0, 1000, 105);
 				btnBackLData.top =  new FormAttachment(0, 1000, 121);
 				btnBack.setLayoutData(btnBackLData);
 				btnBack.setText("<");

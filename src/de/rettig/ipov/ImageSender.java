@@ -90,4 +90,9 @@ public class ImageSender {
 		Thread.sleep(1000);
 		imageSender.sendImage("./images/smile.bmp");
 	}
+
+	public void sendTimelineIndex(byte index) throws IOException {
+		writeToPort("p".getBytes());
+		writeToPort(new byte[]{index});
+	}
 }
