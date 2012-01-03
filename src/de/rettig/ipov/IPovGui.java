@@ -47,9 +47,9 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 	private Button btnOpen;
 	private ImageSender imageSender;
 	private String fileName;
-	private int index;
+	private int index = -1;
 	StringRenderer stringRenderer = new StringRenderer();
-	//private String port = "/dev/tty.usbserial-A8004Zfe";
+//	private String port = "/dev/tty.usbserial-A8004Zfe";
 	private String port = "/dev/tty.WiiCopter-DevB";
 	private Spinner spinner1;
 	private Button btnTime;
@@ -94,6 +94,16 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 	
 		try {
 			imageSender = new ImageSender(port);
+			imageSender.addReceiveListener(new ReceiveListener(){
+
+				@Override
+				public void dataReceived(byte[] data) {
+					if (data[0] == 'l' & index >= 0){
+						next(1);
+					}
+				}
+				
+			});
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -176,7 +186,8 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 				btnNext.setText(">");
 				btnNext.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						next(1);
+						index = 0;
+						//next(1);
 					}
 				});
 			}
@@ -273,14 +284,18 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 	}
 
 	protected void next(int n) {
-		index += n;
-		if (index>0 & index <5){
+		if (index>=0 & index <13){
 			try {
-				imageSender.sendImage("./images/smile"+index+".bmp");
+				imageSender.sendImage("./images/auge"+index+".bmp");
+				index += n;
+				//index = index %5;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		if (index>=13){
+			index = -1;
 		}
 	}
 

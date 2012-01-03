@@ -1,3 +1,5 @@
+#include <SerialPort.h>
+
 /*
  iPov
  A rotating Pov-Display which receives its data through a serial port.
@@ -7,7 +9,7 @@
 
 #include "debounce.h"
 #include "face.h"
-#include "flup.h"
+//#include "flup.h"
 
 #define NumLED 16
 #define Rows 64
@@ -28,13 +30,16 @@ int inByte = 0;
 int offset = 0;
 int timeLineIndex = 0;
 
+SerialPort<0, 128, 0> NewSerial;
+
 volatile boolean start = false;
 
 //Debounce debounce(40);
 int receiveCounter = 0;
 
-int* dispBuffer;//[Rows*2];
-int** timeline;//[Rows*2];
+int dispBuffer[Rows*2];
+//int* dispBuffer2;
+//int** timeline;//[Rows*2];
 
 //int* dispBuffer;//[Rows*2];
 //int timeline[5][Rows*2];
@@ -58,51 +63,48 @@ void setLeds(int bits, int group){
 }
 
 void setDispBuffer(int* newDispBuffer){
-    dispBuffer = newDispBuffer;
+  // dispBuffer = newDispBuffer;
 }
 
 void setup() {
-  Serial.begin(115200);
+  NewSerial.begin(115200);
   for (int i = 0; i< 18; i++){
     pinMode(i, OUTPUT); 
   }
-  //dispBuffer = (int*)  malloc(Rows*2*sizeof(int));
-  timeline   = (int**) malloc(10*Rows*2*sizeof(int));
-  
+  //dispBuffer =  (int*)  malloc(Rows*2*sizeof(int));
+  //dispBuffer2 = (int*)  malloc(Rows*2*sizeof(int));
+
+  //timeline   = (int**) malloc(10*Rows*2*sizeof(int));
+
   //for(int i = 0; i < 1; i++){
   //    timeline[i] = (int *)malloc(2 * Rows * sizeof(int));
   //}
 
   for (int i=0;i<Rows*2;i++){
-     // dispBuffer[i] = 0;
+    dispBuffer[i] = 0;
   }
   attachInterrupt(0, on, RISING);
-  Serial.println("setup");
-  
-    setDispBuffer(face);
-  
-    timeline[0] = face;
-    timeline[1] = flup;
-    timeline[2] = face;
-    timeline[3] = flup;
-    timeline[4] = face;
-    timeline[5] = flup;
-  
+  NewSerial.println("setup");
+
+  //setDispBuffer(face);
+
+
 }
 
 void receiveImage(){
-  if (Serial.available()){
-    while(Serial.available())  {
-      int inByte = Serial.read();
+  if (NewSerial.available()){
+    while(NewSerial.available())  {
+      int inByte = NewSerial.read();
       /* Ready to receive */
       if (receiveCounter == 0){
+        //Serial.println("RCV");
         /* 'd' starts a data package */
         switch (inByte){
         case 'd':
           receiveState = RECEIVE_IMAGE;
           receiveCounter = 127;
           break;
-        /* 'o' sets the offset */
+          /* 'o' sets the offset */
         case 'o':
           receiveState = RECEIVE_OFFSET;
           receiveCounter = 1;
@@ -111,7 +113,7 @@ void receiveImage(){
           receiveState = RECEIVE_INDEX;
           receiveCounter = 1;
           break;
-      
+
         default:
           receiveState = RECEIVE_NONE;
           break;
@@ -121,15 +123,15 @@ void receiveImage(){
         /* Receive data */
         switch(receiveState){
         case  RECEIVE_IMAGE:
+          //Serial.println(receiveCounter);
           dispBuffer[127-receiveCounter] = inByte;
-          //timeline[timeLineIndex][127-receiveCounter] = inByte;
           break;
         case RECEIVE_OFFSET:
           offset = inByte;
           break;
         case RECEIVE_INDEX:
           timeLineIndex = inByte;
-          dispBuffer = timeline[timeLineIndex];
+          //dispBuffer = timeline[timeLineIndex];
           break;
         default:
           break;
@@ -151,27 +153,28 @@ void on()
 }
 
 void loop() {
-  receiveImage();
 
   float oneRow = interval / Rows;
-  
+
   if (start){
+    NewSerial.println("l");
+
     start = false; 
     for (int i=0;i<Rows*2;i+=2){
-      long startTime = micros()-100;
+      long startTime = micros();
       int index = (i+offset*2) % (Rows*2);
-      
+
       setLeds(dispBuffer[index],0);
       setLeds(dispBuffer[index+1],1);
-      
-     // setLeds(timeline[timeLineIndex][index],0);
-     // setLeds(timeline[timeLineIndex][index+1],1);
-       Serial.println("Huch");
+
       if (start)break;
-      delayMicroseconds(oneRow - (micros()-startTime));
+      delayMicroseconds(oneRow - (micros()-startTime-150));
     }
   }
+  receiveImage();
+
 }
+
 
 
 

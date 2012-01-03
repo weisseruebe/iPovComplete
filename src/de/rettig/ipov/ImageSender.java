@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TooManyListenersException;
 
 import javax.imageio.ImageIO;
@@ -20,6 +22,7 @@ public class ImageSender {
 	
 	private SerialPort port;
 	private OutputStream outputStream;
+	private List<ReceiveListener> listeners = new ArrayList<ReceiveListener>();
 
 	public ImageSender(String portname) throws PortInUseException, NoSuchPortException, UnsupportedCommOperationException, TooManyListenersException, IOException{
 	    port = (SerialPort)CommPortIdentifier.getPortIdentifier(portname).open("iPov",2000);
@@ -34,10 +37,17 @@ public class ImageSender {
 				if(arg0.getEventType() == SerialPortEvent.DATA_AVAILABLE){
 					byte[] in = read();
 					System.out.print(new String(in));
+					for (ReceiveListener r:listeners){
+						r.dataReceived(in);
+					}
 				}
 			}
 			
 		});
+	}
+	
+	public void addReceiveListener(ReceiveListener r){
+		listeners.add(r);
 	}
 	
 	public byte[] read() {
@@ -71,13 +81,13 @@ public class ImageSender {
 	}
 	
 	public void sendImage(String fileName) throws IOException{
-		writeToPort("d".getBytes());
-		writeToPort(ImageConverter.convert(ImageIO.read(new File(fileName))));
+		sendImage(ImageIO.read(new File(fileName)));
 	}
 	
 	public void sendImage(BufferedImage bufferedImage) throws IOException{
 		writeToPort("d".getBytes());
-		writeToPort(ImageConverter.convert(bufferedImage));
+		byte[] i = ImageConverter.convert(bufferedImage);
+		writeToPort(i);
 	}
 	
 	public void sendOffset(byte offset) throws IOException{
