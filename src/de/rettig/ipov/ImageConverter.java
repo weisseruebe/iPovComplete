@@ -62,7 +62,13 @@ public class ImageConverter {
 	
 	public static void main(String[] args) {
 		try {
-			System.out.println(createCArrayString(ImageIO.read(new File("./images/gesicht.bmp"))));
+			byte[] b = convert(ImageIO.read(new File("./images/auge.bmp")));
+			for (byte bb:b){
+				System.out.println(bb);
+				
+			}
+				
+			//System.out.println(createCArrayString(ImageIO.read(new File("./images/auge.bmp"))));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

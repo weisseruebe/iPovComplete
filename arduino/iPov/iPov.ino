@@ -15,7 +15,6 @@
 #define Rows 64
 
 /* Receive states */
-#define RECEIVE_INDEX 3
 #define RECEIVE_IMAGE 2
 #define RECEIVE_OFFSET 1
 #define RECEIVE_NONE 0;
@@ -24,7 +23,7 @@ int receiveState = RECEIVE_NONE;
 
 float interval = 1000;
 
-long lstDebounceTime = 0;  // the last time the output pin was toggled
+long lstDebounceTime = 0;     // the last time the output pin was toggled
 long dbounceDelay = 50000;    // the debounce time; increase if the output flickers
 int inByte = 0;
 int offset = 0;
@@ -34,15 +33,9 @@ SerialPort<0, 128, 0> NewSerial;
 
 volatile boolean start = false;
 
-//Debounce debounce(40);
 int receiveCounter = 0;
 
 int dispBuffer[Rows*2];
-//int* dispBuffer2;
-//int** timeline;//[Rows*2];
-
-//int* dispBuffer;//[Rows*2];
-//int timeline[5][Rows*2];
 
 
 /* Mapping from LED-No to Pin */
@@ -71,23 +64,11 @@ void setup() {
   for (int i = 0; i< 18; i++){
     pinMode(i, OUTPUT); 
   }
-  //dispBuffer =  (int*)  malloc(Rows*2*sizeof(int));
-  //dispBuffer2 = (int*)  malloc(Rows*2*sizeof(int));
-
-  //timeline   = (int**) malloc(10*Rows*2*sizeof(int));
-
-  //for(int i = 0; i < 1; i++){
-  //    timeline[i] = (int *)malloc(2 * Rows * sizeof(int));
-  //}
-
   for (int i=0;i<Rows*2;i++){
     dispBuffer[i] = 0;
   }
   attachInterrupt(0, on, RISING);
   NewSerial.println("setup");
-
-  //setDispBuffer(face);
-
 
 }
 
@@ -97,7 +78,6 @@ void receiveImage(){
       int inByte = NewSerial.read();
       /* Ready to receive */
       if (receiveCounter == 0){
-        //Serial.println("RCV");
         /* 'd' starts a data package */
         switch (inByte){
         case 'd':
@@ -109,11 +89,7 @@ void receiveImage(){
           receiveState = RECEIVE_OFFSET;
           receiveCounter = 1;
           break;
-        case 'p':
-          receiveState = RECEIVE_INDEX;
-          receiveCounter = 1;
-          break;
-
+      
         default:
           receiveState = RECEIVE_NONE;
           break;
@@ -123,15 +99,10 @@ void receiveImage(){
         /* Receive data */
         switch(receiveState){
         case  RECEIVE_IMAGE:
-          //Serial.println(receiveCounter);
           dispBuffer[127-receiveCounter] = inByte;
           break;
         case RECEIVE_OFFSET:
           offset = inByte;
-          break;
-        case RECEIVE_INDEX:
-          timeLineIndex = inByte;
-          //dispBuffer = timeline[timeLineIndex];
           break;
         default:
           break;
@@ -168,7 +139,7 @@ void loop() {
       setLeds(dispBuffer[index+1],1);
 
       if (start)break;
-      delayMicroseconds(oneRow - (micros()-startTime-150));
+      delayMicroseconds(oneRow - (micros()-startTime+150));
     }
   }
   receiveImage();
