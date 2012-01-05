@@ -73,7 +73,7 @@ void setup() {
 }
 
 void receiveImage(){
-  if (NewSerial.available()){
+  //if (NewSerial.available()){
     while(NewSerial.available())  {
       int inByte = NewSerial.read();
       /* Ready to receive */
@@ -111,7 +111,7 @@ void receiveImage(){
         receiveCounter--;
       }
     }
-  }
+//  }
 }
 
 void on()
@@ -142,7 +142,12 @@ void loop() {
       delayMicroseconds(oneRow - (micros()-startTime+150));
     }
   }
+  
+  //setLED(1,1);
+  //long t = micros();
   receiveImage();
+  //NewSerial.println(micros()-t);
+  //setLED(1,0);
 
 }
 
