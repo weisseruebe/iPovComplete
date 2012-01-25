@@ -24,12 +24,12 @@ int receiveState = RECEIVE_NONE;
 float interval = 1000;
 
 long lstDebounceTime = 0;     // the last time the output pin was toggled
-long dbounceDelay = 50000;    // the debounce time; increase if the output flickers
+long dbounceDelay = 10000;    // the debounce time; increase if the output flickers
 int inByte = 0;
 int offset = 0;
 int timeLineIndex = 0;
 
-SerialPort<0, 128, 0> NewSerial;
+SerialPort<0, 150, 0> NewSerial;
 
 volatile boolean start = false;
 
@@ -55,10 +55,6 @@ void setLeds(int bits, int group){
   }
 }
 
-void setDispBuffer(int* newDispBuffer){
-  // dispBuffer = newDispBuffer;
-}
-
 void setup() {
   NewSerial.begin(115200);
   for (int i = 0; i< 18; i++){
@@ -69,12 +65,12 @@ void setup() {
   }
   attachInterrupt(0, on, RISING);
   NewSerial.println("setup");
-
 }
 
 void receiveImage(){
   //if (NewSerial.available()){
     while(NewSerial.available())  {
+     // cli();
       int inByte = NewSerial.read();
       /* Ready to receive */
       if (receiveCounter == 0){
@@ -99,7 +95,7 @@ void receiveImage(){
         /* Receive data */
         switch(receiveState){
         case  RECEIVE_IMAGE:
-          dispBuffer[127-receiveCounter] = inByte;
+          dispBuffer[127-receiveCounter] = inByte; // Drehen!
           break;
         case RECEIVE_OFFSET:
           offset = inByte;
@@ -107,11 +103,12 @@ void receiveImage(){
         default:
           break;
         }
-
         receiveCounter--;
+        //if (receiveCounter == 0) NewSerial.print("r");
       }
-    }
-//  }
+      //sei();
+    //}
+  }
 }
 
 void on()
@@ -124,30 +121,27 @@ void on()
 }
 
 void loop() {
-
+  receiveImage();
+  
   float oneRow = interval / Rows;
-
   if (start){
-    NewSerial.println("l");
-
     start = false; 
+    NewSerial.print("l");
     for (int i=0;i<Rows*2;i+=2){
       long startTime = micros();
       int index = (i+offset*2) % (Rows*2);
 
+      if (start)break;
       setLeds(dispBuffer[index],0);
       setLeds(dispBuffer[index+1],1);
 
       if (start)break;
-      delayMicroseconds(oneRow - (micros()-startTime+150));
+      //delayMicroseconds(oneRow - (micros()-startTime)-150);
+      delayMicroseconds(oneRow);
+      
     }
   }
-  
-  //setLED(1,1);
-  //long t = micros();
-  receiveImage();
-  //NewSerial.println(micros()-t);
-  //setLED(1,0);
+
 
 }
 
