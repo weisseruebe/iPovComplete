@@ -47,7 +47,7 @@ int LEDs[] = {
 
 void setup() {
   NewSerial.begin(115200);
-  for (int i = 0; i< 18; i++){
+  for (int i = 0; i< 19; i++){
     pinMode(i, OUTPUT); 
   }
   for (int i=0;i<Rows*2;i++){
