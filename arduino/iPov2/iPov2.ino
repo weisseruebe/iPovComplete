@@ -25,7 +25,7 @@ SerialPort<0, 150, 0> serial;
 float interval = 1000;
 
 long lstDebounceTime = 0;     // the last time the output pin was toggled
-long dbounceDelay    = 5000;  // the debounce time in microseconds
+long dbounceDelay    = 9000;  // the debounce time in microseconds
 float oneRow         = 100;   //Time for one column
 
 int inByte = 0;
@@ -44,9 +44,11 @@ int LEDs[] = {
 
 void setup() {
   serial.begin(115200);
+  /* Switch the LED pins to output */
   for (int i = 0; i< 19; i++){
     pinMode(i, OUTPUT); 
   }
+  /* Initialize with a funny face :-) */
   for (int i=0;i<Rows*2;i++){
     dispBuffer[i]  = face[i];
     dispBuffer2[i] = face[i];
