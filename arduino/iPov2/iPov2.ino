@@ -10,8 +10,6 @@
 
 #include "debounce.h"
 #include "face.h"
-#include "flup.h"
-
 
 #define NumLED 16
 #define Rows 64
@@ -20,25 +18,24 @@
 #define RECEIVE_IMAGE 2
 #define RECEIVE_OFFSET 1
 #define RECEIVE_NONE 0;
-
 int receiveState = RECEIVE_NONE;
+
+SerialPort<0, 150, 0> serial;
 
 float interval = 1000;
 
 long lstDebounceTime = 0;     // the last time the output pin was toggled
-long dbounceDelay = 10000;    // the debounce time; increase if the output flickers
+long dbounceDelay    = 5000;  // the debounce time in microseconds
+float oneRow         = 100;   //Time for one column
+
 int inByte = 0;
-int offset = 0;
-float oneRow = 100;
+int offset = 0;               //Angle offset
+int receiveCounter = 0;       //Counter for bytes to be received
+int dispBuffer[Rows*2];       //First display buffer
+int dispBuffer2[Rows*2];      //Second display buffer
 
-SerialPort<0, 150, 0> NewSerial;
-
-int receiveCounter = 0;
-int dispBuffer[Rows*2];
-int dispBuffer2[Rows*2];
-
-boolean dispToggle = true;
-boolean newData = false;
+boolean dispToggle = true;   //Toggle flag for the display buffers
+boolean newData = false;     //Flag that indicated new buffer data
 
 /* Mapping from LED-No to Pin */
 int LEDs[] = {
@@ -46,45 +43,44 @@ int LEDs[] = {
 };
 
 void setup() {
-  NewSerial.begin(115200);
+  serial.begin(115200);
   for (int i = 0; i< 19; i++){
     pinMode(i, OUTPUT); 
   }
   for (int i=0;i<Rows*2;i++){
     dispBuffer[i]  = face[i];
-    dispBuffer2[i] = flup[i];
+    dispBuffer2[i] = face[i];
   }
   attachInterrupt(0, isr, RISING);
-  NewSerial.println("setup");
 }
 
-
+/* Set a single LED */
 void setLED(int n, int state){
   if (n<16){
     digitalWrite(LEDs[n],state);
   }
 }
 
+/* Set LEDs according to bits */
 void setLeds(int bits, int group){
   for (int i=0;i<8;i++){
     setLED(i+group*8,(bits & B10000000 >> i) > 0);
   }
 }
 
-
+/* Receive serial data if available */
 void receiveData(){
-
-  while(NewSerial.available())  {
-    int inByte = NewSerial.read();
+  while(serial.available())  {
+    int inByte = serial.read();
     /* Ready to receive */
     if (receiveCounter == 0){
-      /* 'd' starts a data package */
       switch (inByte){
-      case 'd':
+        /* 'd' starts a data package */
+        case 'd':
         receiveState = RECEIVE_IMAGE;
         receiveCounter = 127;
         break;
-        /* 'o' sets the offset */
+        /* 'o' sets the offset      */
       case 'o':
         receiveState = RECEIVE_OFFSET;
         receiveCounter = 1;
@@ -100,10 +96,10 @@ void receiveData(){
       switch(receiveState){
       case  RECEIVE_IMAGE:
         if (dispToggle){
-          dispBuffer2[127-receiveCounter] = inByte;
+          dispBuffer2[receiveCounter] = inByte;
         } 
         else {
-          dispBuffer[127-receiveCounter] = inByte;
+          dispBuffer[receiveCounter] = inByte;
         }
         if (receiveCounter == 1) {
           newData = true;
@@ -120,37 +116,37 @@ void receiveData(){
   }
 }
 
+/* The interrupt routine */
 void isr()
 {
   if (micros() -lstDebounceTime > dbounceDelay){
-    NewSerial.print("l");
-    //Toggle the buffers if newData arrived
+    /* Send the loop message */
+    serial.print("l");
+    /* Toggle the buffers if newData arrived */
     if (newData){
       newData = false;
       dispToggle = !dispToggle; 
     }
-    //Calculate the time for one turn
+    /* Calculate the time for one turn */
     interval = micros()-lstDebounceTime;
-    //Save the last trigger time
+    /* Save the last trigger time */
     lstDebounceTime = micros();
     oneRow = interval / Rows;
   }
 }
 
+/* Main loop */
 void loop() {
   receiveData();
 
   int i = (micros() - lstDebounceTime) / oneRow;
   int index = (i % Rows * 2 + offset*2) % (Rows*2);
   if (dispToggle){
-    setLeds(dispBuffer[index],0);
-    setLeds(dispBuffer[index+1],1);
-           //NewSerial.println("B1");
-  } 
-  else {
-    setLeds(dispBuffer2[index],0);
-    setLeds(dispBuffer2[index+1],1);
-           //NewSerial.println("B2");
+    setLeds(dispBuffer[index],1);
+    setLeds(dispBuffer[index+1],0);
+  } else {
+    setLeds(dispBuffer2[index],1);
+    setLeds(dispBuffer2[index+1],0);
   }
 }
 
