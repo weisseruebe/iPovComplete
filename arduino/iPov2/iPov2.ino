@@ -8,7 +8,6 @@
  Andreas Rettig, 2011, Beuth Hochschule für Technik
  */
 
-#include "debounce.h"
 #include "face.h"
 
 #define NumLED 16
@@ -22,11 +21,10 @@ int receiveState = RECEIVE_NONE;
 
 SerialPort<0, 150, 0> serial;
 
-float interval = 1000;
-
+long interval        = 1000;
 long lstDebounceTime = 0;     // the last time the output pin was toggled
 long dbounceDelay    = 9000;  // the debounce time in microseconds
-float oneRow         = 100;   //Time for one column
+long oneRow          = 100;   // Time for one column
 
 int inByte = 0;
 int offset = 0;               //Angle offset
@@ -121,19 +119,25 @@ void receiveData(){
 /* The interrupt routine */
 void isr()
 {
-  if (micros() -lstDebounceTime > dbounceDelay){
+  if (micros() - lstDebounceTime > dbounceDelay){
+  
     /* Send the loop message */
     serial.print("l");
+  
     /* Toggle the buffers if newData arrived */
     if (newData){
       newData = false;
       dispToggle = !dispToggle; 
     }
+  
     /* Calculate the time for one turn */
     interval = micros()-lstDebounceTime;
+    oneRow = interval / Rows;
+
+    
     /* Save the last trigger time */
     lstDebounceTime = micros();
-    oneRow = interval / Rows;
+ 
   }
 }
 
@@ -141,14 +145,15 @@ void isr()
 void loop() {
   receiveData();
 
-  int i = (micros() - lstDebounceTime) / oneRow;
-  int index = (i % Rows * 2 + offset*2) % (Rows*2);
+  long elapsed = (micros() - lstDebounceTime);
+  int index = (elapsed / oneRow + offset) % Rows;
+  
   if (dispToggle){
-    setLeds(dispBuffer[index],1);
-    setLeds(dispBuffer[index+1],0);
+    setLeds(dispBuffer[index*2],1);
+    setLeds(dispBuffer[index*2+1],0);
   } else {
-    setLeds(dispBuffer2[index],1);
-    setLeds(dispBuffer2[index+1],0);
+    setLeds(dispBuffer2[index*2],1);
+    setLeds(dispBuffer2[index*2+1],0);
   }
 }
 
