@@ -167,7 +167,7 @@ public class IPovGui extends org.eclipse.swt.widgets.Composite {
 				scale1LData.top =  new FormAttachment(0, 1000, 99);
 				scale1 = new Scale(this, SWT.NONE);
 				scale1.setLayoutData(scale1LData);
-				scale1.setMaximum(63);
+				scale1.setMaximum(255);
 				scale1.setPageIncrement(1);
 				scale1.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {

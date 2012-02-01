@@ -146,8 +146,9 @@ void loop() {
   receiveData();
 
   long elapsed = (micros() - lstDebounceTime);
-  int index = (elapsed / oneRow + offset) % Rows;
-  
+  long offsetMS = interval/255 * offset;
+  long index = ((elapsed+offsetMS) / oneRow) % Rows;
+
   if (dispToggle){
     setLeds(dispBuffer[index*2],1);
     setLeds(dispBuffer[index*2+1],0);
