@@ -65,7 +65,7 @@ public class ImageSender {
 		return new byte[0]; 
 	}
 
-	protected void writeToPort(byte[] data) throws IOException {
+	public void writeToPort(byte[] data) throws IOException {
 		outputStream.write(data);
 	}
 	
