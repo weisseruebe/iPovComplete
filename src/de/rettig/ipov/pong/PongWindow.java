@@ -45,6 +45,7 @@ public class PongWindow extends org.eclipse.swt.widgets.Composite {
 	private PongModel pongModel = new PongModel();
 	private PongRenderer povRenderer = new PongRenderer(pongModel);
 	private Timer timer = new Timer();
+	protected char keyDown;
 
 	private PaintListener paintField = new PaintListener(){
 
@@ -58,7 +59,7 @@ public class PongWindow extends org.eclipse.swt.widgets.Composite {
 				for (int y = 0;y < pongModel.fieldHeight;y++){
 					int bit = y % 8;
 					int pos = (x*16+y)/8;
-					if ((1 << bit & data[pos]) != 0){
+					if ((128 >> bit & data[pos]) != 0){
 						gc.drawPoint(x, y);
 					}
 				}	
@@ -66,7 +67,6 @@ public class PongWindow extends org.eclipse.swt.widgets.Composite {
 		}
 
 	};
-	protected char keyDown;
 
 	private KeyListener keyListener = new KeyListener(){
 
@@ -171,7 +171,7 @@ public class PongWindow extends org.eclipse.swt.widgets.Composite {
 				});
 			}
 		};
-		timer.schedule(task, 10, 50);
+		timer.schedule(task, 10, 20);
 	}
 
 	private void sendToPov(){

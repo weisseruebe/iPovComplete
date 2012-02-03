@@ -13,7 +13,7 @@ public class PongModel {
 	int p2Pos = 0;
 	
 	Point ballPos = new Point(0,2);
-	Vector2f ballDir = new Vector2f(1,1);
+	Vector2f ballDir = new Vector2f(1.4f,1.1f);
 	
 	float speed = 2; //pixel pro runde
 	
