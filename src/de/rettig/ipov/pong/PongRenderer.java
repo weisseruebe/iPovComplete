@@ -29,10 +29,12 @@ public class PongRenderer {
 		//Ball
 		int ballIndex = pongModel.ballPos.x * 2 + 1-(pongModel.ballPos.y / 8);
 		if (ballIndex >= 0 & ballIndex < buffer.length){
-			buffer[ballIndex % 128]   |= 3 << pongModel.ballPos.y % 8;
+			buffer[ballIndex % 128]     |= 3 << pongModel.ballPos.y % 8;
 			buffer[(ballIndex+2) % 128] |= 3 << pongModel.ballPos.y % 8;
-			
 		}
+		buffer[pongModel.wallPos*2]   = (byte) 0xFF;
+		buffer[pongModel.wallPos*2+1] = (byte) 0xFF;
+		
 		return buffer;
 	}
 

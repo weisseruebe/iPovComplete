@@ -87,7 +87,7 @@ public class PongWindow extends org.eclipse.swt.widgets.Composite {
 
 		@Override
 		public void mouseMove(MouseEvent arg0) {
-			pongModel.setP2(arg0.x);
+			pongModel.setP1(arg0.x);
 		}
 		
 	};
@@ -171,7 +171,7 @@ public class PongWindow extends org.eclipse.swt.widgets.Composite {
 				});
 			}
 		};
-		timer.schedule(task, 10, 50);
+		timer.schedule(task, 10, 40);
 	}
 
 	private void sendToPov(){
@@ -201,7 +201,7 @@ public class PongWindow extends org.eclipse.swt.widgets.Composite {
 				compField.setLayoutData(compFieldLData);
 				compField.addPaintListener(paintField);
 				compField.addKeyListener(keyListener);
-				compField.addMouseMoveListener(mouseMove );
+				compField.addMouseMoveListener(mouseMove);
 			}
 			this.layout();
 		} catch (Exception e) {
