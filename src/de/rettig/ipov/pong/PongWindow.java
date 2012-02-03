@@ -171,7 +171,7 @@ public class PongWindow extends org.eclipse.swt.widgets.Composite {
 				});
 			}
 		};
-		timer.schedule(task, 10, 20);
+		timer.schedule(task, 10, 50);
 	}
 
 	private void sendToPov(){
@@ -180,7 +180,7 @@ public class PongWindow extends org.eclipse.swt.widgets.Composite {
 			imageSender.writeToPort(povRenderer.render());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	

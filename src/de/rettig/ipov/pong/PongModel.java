@@ -17,6 +17,11 @@ public class PongModel {
 	
 	float speed = 2; //pixel pro runde
 	
+	void restart(){
+		ballPos = new Point(0,2);
+		ballDir = new Vector2f(1.4f,1.1f);
+	}
+	
 	void moveP1(int dif){
 		p1Pos += dif;
 		if (p1Pos < 0){
@@ -45,9 +50,20 @@ public class PongModel {
 		ballDir.normalize();
 		
 		/* Oben oder unten */
-		if (ballPos.y <= 0 | ballPos.y >= fieldHeight-1){
-			ballDir.y = -ballDir.y;			
-		} 
+		if (ballPos.y <= 0 ){
+			if ((ballPos.x >= p1Pos) & (ballPos.x  <= p1Pos + pWidth)){
+				ballDir.y = -ballDir.y;		
+			} else {
+				restart();
+			}		
+		}
+		if (ballPos.y >= fieldHeight-1){
+			//if ((ballPos.x >= p2Pos) & (ballPos.x  <= p2Pos + pWidth)){
+				ballDir.y = -ballDir.y;		
+			//} else {
+			//	restart();
+			//}
+		}
 		
 		/* Move */
 		ballPos.x += (int) (speed*ballDir.x);
